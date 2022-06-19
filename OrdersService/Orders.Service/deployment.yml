@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: youtube
+spec:
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+      annotations:
+        dapr.io/app-id: order-service
+        dapr.io/app-port: "5001"
+        dapr.io/enabled: "true"
+    spec:
+      containers:
+      - name: order-service
+        image: order-service:1.0.0-rc2
+        ports:
+        - containerPort: 5001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  namespace: youtube
+spec:
+  selector:
+    app: order-service
+  ports:
+  - port: 1234
+    targetPort: 5001
+
