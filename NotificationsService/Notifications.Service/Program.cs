@@ -1,4 +1,5 @@
 using MediatR;
+using Notifications.Service.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +12,18 @@ builder.Services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(typeof(Program).Assembly);
-
+builder.Services.AddSignalR();
+builder.Services.AddCors(options => {
+    options.AddDefaultPolicy(p => {
+        p.AllowAnyHeader();
+        p.AllowAnyMethod();
+        p.WithOrigins("http://localhost:8080");
+        p.AllowCredentials();
+    });
+});
 var app = builder.Build();
+
+app.UseCors();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -21,7 +32,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 
 app.UseCloudEvents();
 
@@ -29,5 +39,6 @@ app.UseAuthorization();
 
 app.MapSubscribeHandler();
 app.MapControllers();
+app.MapHub<NotificationHub>("/notifications");
 
 app.Run();

@@ -22,6 +22,11 @@ public class GetOrderQuery : IRequest<Order>
                 .Include(x => x.Product)
                 .FirstOrDefault(x => x.Id == request.Id);
             
+            var product = _dbContext.Products
+                .FirstOrDefault(x => x.Id == order.ProductId);
+
+            order.Product = product;
+
             return Task.FromResult(order);
         }
     }
